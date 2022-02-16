@@ -4,7 +4,7 @@ pub struct Map {
     pub height: usize,
     pub entries: Vec<String>,
     pub exits: Vec<String>,
-    pub content: Vec<String>,
+    pub content: Vec<Vec<char>>,
 }
 
 impl Map {
@@ -29,7 +29,10 @@ impl Map {
                 height: height - 2,
                 entries,
                 exits,
-                content: content[1..=(height - 2)].into(),
+                content: content[1..=(height - 2)]
+                    .iter()
+                    .map(|l| l.split(' ').collect::<String>().chars().collect())
+                    .collect::<Vec<_>>(),
             })
         } else {
             Err("Content with not enough lines".to_owned())
