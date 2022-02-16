@@ -8,6 +8,7 @@ pub struct Map {
 }
 
 impl Map {
+    /// Creates a `Map` struct from a size (width/height) and a content.
     pub fn from_size_and_content(
         width: usize,
         height: usize,
@@ -15,11 +16,11 @@ impl Map {
     ) -> Result<Map, String> {
         if content.len() >= height {
             let entries = content[0]
-                .split(" ")
+                .split(' ')
                 .map(|s| s.to_owned())
                 .collect::<Vec<_>>();
             let exits = content[height - 1]
-                .split(" ")
+                .split(' ')
                 .map(|s| s.to_owned())
                 .collect::<Vec<_>>();
 
@@ -35,6 +36,7 @@ impl Map {
         }
     }
 
+    /// Validates the correctness of the map.
     pub fn validate(&self) -> Result<(), String> {
         let has_same_entries_exits_count = self.entries.len() == self.exits.len();
         let has_correct_height = self.content.len() == self.height;
