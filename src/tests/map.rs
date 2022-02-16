@@ -36,7 +36,12 @@ mod tests {
             height: 3,
             entries: vec!["A".to_owned(), "B".to_owned(), "C".to_owned()],
             exits: vec!["1".to_owned(), "2".to_owned(), "3".to_owned()],
-            content: vec!["".to_owned(), "".to_owned(), "".to_owned()],
+            content: vec![
+                "A B C".to_owned(),
+                "".to_owned(),
+                "".to_owned(),
+                "1 2 3".to_owned(),
+            ],
         };
 
         assert!(map.validate().is_err());
@@ -49,7 +54,7 @@ mod tests {
             height: 3,
             entries: vec!["A".to_owned(), "B".to_owned(), "C".to_owned()],
             exits: vec!["1".to_owned(), "2".to_owned()],
-            content: vec!["".to_owned(), "".to_owned(), "".to_owned()],
+            content: vec!["A B C".to_owned(), "".to_owned(), "1 2".to_owned()],
         };
 
         assert!(map.validate().is_err());
