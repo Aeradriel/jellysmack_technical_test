@@ -26,10 +26,10 @@ impl Map {
 
             Ok(Map {
                 width,
-                height,
+                height: height - 2,
                 entries,
                 exits,
-                content,
+                content: content[1..=(height - 2)].into(),
             })
         } else {
             Err("Content with not enough lines".to_owned())
