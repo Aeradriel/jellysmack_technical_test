@@ -135,4 +135,134 @@ mod tests {
             assert_eq!(map.can_go_to_sides_for_coords(2, 2), Ok((true, false)));
         }
     }
+
+    mod exit_for_entry {
+        use super::*;
+
+        #[test]
+        fn works_with_small_map() {
+            let map = Map::from_size_and_content(
+                7,
+                7,
+                vec![
+                    "A   B  C".to_owned(),
+                    "|     | | ".to_owned(),
+                    "|--| | ".to_owned(),
+                    "| |--| ".to_owned(),
+                    "| |--| ".to_owned(),
+                    "| | | ".to_owned(),
+                    "1  2  3".to_owned(),
+                ],
+            )
+            .expect("Could not create map");
+
+            assert_eq!(map.exit_for_entry("A"), Ok("2".to_owned()));
+            assert_eq!(map.exit_for_entry("B"), Ok("1".to_owned()));
+            assert_eq!(map.exit_for_entry("C"), Ok("3".to_owned()));
+        }
+
+        #[test]
+        fn works_with_larger_map() {
+            let map = Map::from_size_and_content(
+                16,
+                18,
+                vec![
+                    "P Q R S T U V W".to_owned(),
+                    "| | | | |--| | | ".to_owned(),
+                    "| | |--| | | |--| ".to_owned(),
+                    "| |--| |--| | | | ".to_owned(),
+                    "|--| |--| | | |--| ".to_owned(),
+                    "|--| | | | |--| | ".to_owned(),
+                    "| |--| | |--| |--| ".to_owned(),
+                    "| | | |--| |--| | ".to_owned(),
+                    "|--| | | |--| | | ".to_owned(),
+                    "| | |--| | | | | ".to_owned(),
+                    "| | | |--| | |--| ".to_owned(),
+                    "| | | | |--| | | ".to_owned(),
+                    "|--| | | | | | | ".to_owned(),
+                    "|--| |--| | | |--| ".to_owned(),
+                    "| |--| | |--| | | ".to_owned(),
+                    "| | |--| | | |--| ".to_owned(),
+                    "|--| |--| | |--| | ".to_owned(),
+                    "1 2 3 4 5 6 7 8".to_owned(),
+                ],
+            )
+            .expect("Could not create map");
+
+            assert_eq!(map.exit_for_entry("P"), Ok("3".to_owned()));
+            assert_eq!(map.exit_for_entry("Q"), Ok("7".to_owned()));
+            assert_eq!(map.exit_for_entry("R"), Ok("8".to_owned()));
+            assert_eq!(map.exit_for_entry("S"), Ok("5".to_owned()));
+            assert_eq!(map.exit_for_entry("T"), Ok("6".to_owned()));
+            assert_eq!(map.exit_for_entry("U"), Ok("2".to_owned()));
+            assert_eq!(map.exit_for_entry("V"), Ok("4".to_owned()));
+            assert_eq!(map.exit_for_entry("W"), Ok("1".to_owned()));
+        }
+
+        #[test]
+        fn works_with_no_link_map() {
+            let map = Map::from_size_and_content(
+                7,
+                7,
+                vec![
+                    "A   B  C".to_owned(),
+                    "|     | | ".to_owned(),
+                    "|| | ".to_owned(),
+                    "| || ".to_owned(),
+                    "| || ".to_owned(),
+                    "| | | ".to_owned(),
+                    "1  2  3".to_owned(),
+                ],
+            )
+            .expect("Could not create map");
+
+            assert_eq!(map.exit_for_entry("A"), Ok("1".to_owned()));
+            assert_eq!(map.exit_for_entry("B"), Ok("2".to_owned()));
+            assert_eq!(map.exit_for_entry("C"), Ok("3".to_owned()));
+        }
+
+        #[test]
+        fn works_with_full_links_map() {
+            let map = Map::from_size_and_content(
+                7,
+                7,
+                vec![
+                    "A   B  C".to_owned(),
+                    "|   --  | -| ".to_owned(),
+                    "|-| -| ".to_owned(),
+                    "|---- |-| ".to_owned(),
+                    "|- -|--| ".to_owned(),
+                    "|- |- | ".to_owned(),
+                    "1  2  3".to_owned(),
+                ],
+            )
+            .expect("Could not create map");
+
+            assert_eq!(map.exit_for_entry("A"), Ok("2".to_owned()));
+            assert_eq!(map.exit_for_entry("B"), Ok("1".to_owned()));
+            assert_eq!(map.exit_for_entry("C"), Ok("2".to_owned()));
+        }
+
+        #[test]
+        fn ignore_random_characters_in_map() {
+            let map = Map::from_size_and_content(
+                7,
+                7,
+                vec![
+                    "A   B  C".to_owned(),
+                    "|   &é65  |,;: | ".to_owned(),
+                    "|-daz-| | ".to_owned(),
+                    "| |-é&²-| ".to_owned(),
+                    "|54ds |--| ".to_owned(),
+                    "| | *aŵ| ".to_owned(),
+                    "1  2  3".to_owned(),
+                ],
+            )
+            .expect("Could not create map");
+
+            assert_eq!(map.exit_for_entry("A"), Ok("2".to_owned()));
+            assert_eq!(map.exit_for_entry("B"), Ok("1".to_owned()));
+            assert_eq!(map.exit_for_entry("C"), Ok("3".to_owned()));
+        }
+    }
 }

@@ -46,7 +46,14 @@ fn get_map() -> Result<Map, String> {
 fn main() {
     match get_map() {
         Ok(map) => {
-            println!("{:?}", map);
+            for entry in &map.entries {
+                println!(
+                    "{}{}",
+                    entry,
+                    map.exit_for_entry(entry)
+                        .expect("Could not find exit for entry")
+                );
+            }
         }
         Err(err) => {
             eprintln!("{}", err)

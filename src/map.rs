@@ -8,6 +8,15 @@ pub struct Map {
 }
 
 impl Map {
+    /// Split the string into a `Vec<String>` from character ' ' and remove all empty strings.
+    fn string_into_clean_vec(string: &str) -> Vec<String> {
+        string
+            .split(' ')
+            .filter(|s| s != &"")
+            .map(|s| s.to_owned())
+            .collect::<Vec<_>>()
+    }
+
     /// Creates a `Map` struct from a size (width/height) and a content.
     pub fn from_size_and_content(
         width: usize,
@@ -15,14 +24,8 @@ impl Map {
         content: Vec<String>,
     ) -> Result<Map, String> {
         if content.len() >= height {
-            let entries = content[0]
-                .split(' ')
-                .map(|s| s.to_owned())
-                .collect::<Vec<_>>();
-            let exits = content[height - 1]
-                .split(' ')
-                .map(|s| s.to_owned())
-                .collect::<Vec<_>>();
+            let entries = Map::string_into_clean_vec(&content[0]);
+            let exits = Map::string_into_clean_vec(&content[height - 1]);
 
             Ok(Map {
                 width,
@@ -53,6 +56,8 @@ impl Map {
         }
     }
 
+    /// Returns the content coordinates from the "map coordinates".
+    /// Content coordinates match the content Vec while map coordinates match the map lines and columns.
     pub fn content_coords_for_coords(&self, x: usize, y: usize) -> Result<(usize, usize), String> {
         if let Some(line) = self.content.get(y) {
             let mut col_count = 0;
@@ -104,8 +109,6 @@ impl Map {
     }
 
     /// Tells you if you can go to left for the provided coordinates. Coordinates MUST be normal coords (col/line).
-    // TODO: Remove allow dead code
-    #[allow(dead_code)]
     pub fn can_go_to_sides_for_coords(&self, x: usize, y: usize) -> Result<(bool, bool), String> {
         let content_coords = self.content_coords_for_coords(x, y)?;
 
@@ -113,5 +116,40 @@ impl Map {
             self.can_go_left_for_content_coords(content_coords.0, content_coords.1)?,
             self.can_go_right_for_content_coords(content_coords.0, content_coords.1)?,
         ))
+    }
+
+    /// Searches for the right columns to starting path from the provided entry.
+    pub fn starting_coords_for_entry(&self, entry: &str) -> Result<(usize, usize), String> {
+        for (i, entry_self) in self.entries.iter().enumerate() {
+            if entry_self == entry {
+                return Ok((i, 0));
+            }
+        }
+        Err("Entry not found in map".to_owned())
+    }
+
+    /// Searches for the right exit from the provided column.
+    pub fn exit_for_column(&self, x: usize) -> Result<String, String> {
+        for (i, exit) in self.exits.iter().enumerate() {
+            if i == x {
+                return Ok(exit.to_owned());
+            }
+        }
+        Err("Exit not found in map".to_owned())
+    }
+
+    /// Find the exit associated with the providfed entry.
+    pub fn exit_for_entry(&self, entry: &str) -> Result<String, String> {
+        let mut coords = self.starting_coords_for_entry(entry)?;
+
+        while coords.1 < self.height {
+            match self.can_go_to_sides_for_coords(coords.0, coords.1)? {
+                (true, _) => coords.0 -= 1,
+                (_, true) => coords.0 += 1,
+                _ => {}
+            }
+            coords.1 += 1;
+        }
+        self.exit_for_column(coords.0)
     }
 }
