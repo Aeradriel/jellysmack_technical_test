@@ -16,6 +16,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Navigate to folder
+      run: cd stick_path
     - name: Lint
       run: cargo clippy -- -Dwarnings
     - name: Build
