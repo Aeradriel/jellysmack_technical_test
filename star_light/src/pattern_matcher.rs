@@ -1,8 +1,15 @@
 pub struct PatternMatcher {}
 
 impl PatternMatcher {
-    fn pattern_is_valid(pattern: &str) -> bool {
-        !pattern.is_empty() && pattern.len() <= 25
+    pub fn pattern_is_valid(pattern: &str) -> bool {
+        let pattern_length_valid = !pattern.is_empty() && pattern.len() <= 25;
+
+        for c in pattern.chars() {
+            if c != '1' && c != '0' {
+                return false;
+            }
+        }
+        pattern_length_valid
     }
 
     pub fn validate(from: &str, to: &str) -> Result<(), String> {
@@ -38,7 +45,7 @@ impl PatternMatcher {
         pattern.into_iter().collect()
     }
 
-    pub fn first_char_that_does_not_match(from: &str, to: &str) -> Option<usize> {
+    fn first_char_that_does_not_match(from: &str, to: &str) -> Option<usize> {
         for (i, c) in from.chars().enumerate() {
             if c != to.chars().nth(i).expect("No char at index") {
                 return Some(i);
@@ -47,7 +54,7 @@ impl PatternMatcher {
         None
     }
 
-    pub fn change_char_at_index(from: &str, idx: usize, iterations: &mut i32) -> String {
+    fn change_char_at_index(from: &str, idx: usize, iterations: &mut i32) -> String {
         let mut new_from = from.to_owned();
         let actual_char = from.chars().nth(idx).expect("No char at index");
         let new_char = match actual_char {
@@ -61,8 +68,7 @@ impl PatternMatcher {
         new_from
     }
 
-    /// Return
-    pub fn make_subpattern_match(from: &str, to: &str, iterations: &mut i32) -> String {
+    fn make_subpattern_match(from: &str, to: &str, iterations: &mut i32) -> String {
         if let Some(first_wrong_idx) = Self::first_char_that_does_not_match(from, to) {
             let closer_pattern = Self::pattern_to_change_char_at_index(from, first_wrong_idx);
 
