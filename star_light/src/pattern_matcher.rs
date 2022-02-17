@@ -1,6 +1,7 @@
 pub struct PatternMatcher {}
 
 impl PatternMatcher {
+    /// Validates if a pattern is valid (only 0s and 1s and between 1 and 25 chars).
     pub fn pattern_is_valid(pattern: &str) -> bool {
         let pattern_length_valid = !pattern.is_empty() && pattern.len() <= 25;
 
@@ -12,6 +13,7 @@ impl PatternMatcher {
         pattern_length_valid
     }
 
+    /// Validates if a couple from/to is valid. It checks if both have the same length and if pattern are valid.
     pub fn validate(from: &str, to: &str) -> Result<(), String> {
         let start_pattern_valid = PatternMatcher::pattern_is_valid(from);
         let end_pattern_valid = PatternMatcher::pattern_is_valid(to);
@@ -26,13 +28,13 @@ impl PatternMatcher {
         Ok(())
     }
 
+    /// Returns the closest possible pattern needed to be able to change the character at the given index.
     pub fn pattern_to_change_char_at_index(from: &str, idx: usize) -> String {
         let mut pattern: Vec<char> = vec![];
 
         if idx == from.len() - 1 {
             return from.to_owned();
         }
-
         for (i, c) in from.chars().enumerate() {
             if i <= idx {
                 pattern.push(c);
@@ -45,6 +47,8 @@ impl PatternMatcher {
         pattern.into_iter().collect()
     }
 
+    /// Returns the first character's index that does not match both in from and to.
+    /// If both strings are identical, `None` is returned.
     fn first_char_that_does_not_match(from: &str, to: &str) -> Option<usize> {
         for (i, c) in from.chars().enumerate() {
             if c != to.chars().nth(i).expect("No char at index") {
@@ -54,6 +58,9 @@ impl PatternMatcher {
         None
     }
 
+    /// Toggle the char at the given index between 1 and 0.
+    /// It also increase the number of iterations by one.
+    /// This does not handle the check to know if you can do it or not.
     fn change_char_at_index(from: &str, idx: usize, iterations: &mut i32) -> String {
         let mut new_from = from.to_owned();
         let actual_char = from.chars().nth(idx).expect("No char at index");
@@ -68,6 +75,10 @@ impl PatternMatcher {
         new_from
     }
 
+    /// Search for the first char that does not fit the "to" pattern.
+    /// It then identifies the pattern needed to modify the character.
+    /// If the pattern matches the "from" string, it makes the change,
+    /// else it keeps the same "from" but tries to match this new pattern.
     fn make_subpattern_match(from: &str, to: &str, iterations: &mut i32) -> String {
         if let Some(first_wrong_idx) = Self::first_char_that_does_not_match(from, to) {
             let closer_pattern = Self::pattern_to_change_char_at_index(from, first_wrong_idx);
@@ -84,6 +95,7 @@ impl PatternMatcher {
         }
     }
 
+    // Return the minimum number of iterations needed to reach `to` starting from `from`.
     pub fn iterations_for_patterns(from: &str, to: &str) -> i32 {
         let mut actual = from.to_owned();
         let mut iterations = 0;
